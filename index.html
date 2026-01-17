@@ -62,10 +62,11 @@
             right: 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             color: white;
-            font-size: clamp(14px, 3vw, 24px);
+            font-size: clamp(12px, 3vw, 18px);
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             pointer-events: none;
             z-index: 10;
@@ -73,10 +74,11 @@
 
         .stat {
             background: rgba(0,0,0,0.3);
-            padding: clamp(5px, 1vw, 10px) clamp(10px, 2vw, 20px);
-            border-radius: 15px;
+            padding: clamp(4px, 1vw, 8px) clamp(8px, 2vw, 15px);
+            border-radius: 12px;
             backdrop-filter: blur(10px);
             white-space: nowrap;
+            font-size: clamp(11px, 2.5vw, 16px);
         }
 
         #startMenu {
@@ -403,8 +405,25 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Mobile landscape optimizations */
+        /* Mobile landscape - suggest portrait mode */
         @media (max-height: 500px) and (orientation: landscape) {
+            #gameContainer::before {
+                content: "↻ Please rotate your device to portrait mode for the best experience";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.9);
+                color: #7dd3fc;
+                padding: 20px;
+                border-radius: 15px;
+                z-index: 100;
+                text-align: center;
+                font-size: 16px;
+                max-width: 80%;
+                pointer-events: none;
+            }
+            
             #startMenu {
                 padding: 10px;
             }
@@ -419,11 +438,11 @@
             }
         }
 
-        /* Tablet and desktop */
+        /* Tablet and desktop - vertical layout */
         @media (min-width: 768px) {
             #gameContainer {
-                width: min(800px, 90vw);
-                height: min(600px, 90vh);
+                width: min(450px, 90vw);
+                height: min(800px, 90vh);
                 border-radius: 20px;
             }
         }
@@ -580,18 +599,18 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Responsive canvas setup
+        // Responsive canvas setup - VERTICAL/PORTRAIT MODE
         let scale = 1;
-        let canvasWidth = 800;
-        let canvasHeight = 600;
+        let canvasWidth = 450;  // Base width for portrait
+        let canvasHeight = 800; // Base height for portrait
 
         function resizeCanvas() {
             const container = document.getElementById('canvasContainer');
             const containerWidth = container.clientWidth;
             const containerHeight = container.clientHeight;
             
-            // Calculate aspect ratio
-            const targetAspect = 4 / 3; // 800/600
+            // Calculate aspect ratio - PORTRAIT 9:16
+            const targetAspect = 9 / 16; // Portrait mode
             const containerAspect = containerWidth / containerHeight;
             
             if (containerAspect > targetAspect) {
@@ -608,8 +627,8 @@
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             
-            // Calculate scale for game objects
-            scale = canvasWidth / 800;
+            // Calculate scale for game objects (based on width now)
+            scale = canvasWidth / 450;
             
             // Update slime position to stay in bounds
             if (slime.x > canvasWidth) slime.x = canvasWidth / 2;
@@ -647,12 +666,12 @@
         };
 
         const slime = {
-            x: 400,
-            y: 520,
+            x: 225,      // Center of 450px width
+            y: 720,      // Near bottom of 800px height
             width: 60,
             height: 50,
             speed: 8,
-            targetX: 400
+            targetX: 225
         };
 
         class Bubble {
