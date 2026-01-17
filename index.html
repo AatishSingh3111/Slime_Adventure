@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Slime Bubble Pop Adventure</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -19,6 +20,9 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
         #gameContainer {
@@ -27,22 +31,41 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             overflow: hidden;
+            max-width: 100vw;
+            max-height: 100vh;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Responsive canvas container */
+        #canvasContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #gameCanvas {
             display: block;
             cursor: none;
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none;
         }
 
         #ui {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
             color: white;
-            font-size: 24px;
+            font-size: clamp(14px, 3vw, 24px);
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             pointer-events: none;
             z-index: 10;
@@ -50,9 +73,10 @@
 
         .stat {
             background: rgba(0,0,0,0.3);
-            padding: 10px 20px;
+            padding: clamp(5px, 1vw, 10px) clamp(10px, 2vw, 20px);
             border-radius: 15px;
             backdrop-filter: blur(10px);
+            white-space: nowrap;
         }
 
         #startMenu {
@@ -68,16 +92,17 @@
             align-items: center;
             z-index: 30;
             overflow-y: auto;
-            padding: 30px 20px 20px 20px;
+            padding: clamp(15px, 3vh, 30px) clamp(10px, 2vw, 20px);
         }
 
         #startMenu h1 {
-            font-size: 48px;
+            font-size: clamp(24px, 6vw, 48px);
             color: #7dd3fc;
             text-shadow: 0 0 20px rgba(125,211,252,0.5);
-            margin-bottom: 10px;
-            margin-top: 10px;
+            margin-bottom: clamp(5px, 1vh, 10px);
+            margin-top: clamp(5px, 1vh, 10px);
             animation: glow 2s ease-in-out infinite;
+            text-align: center;
         }
 
         @keyframes glow {
@@ -86,29 +111,35 @@
         }
 
         .subtitle {
-            font-size: 18px;
+            font-size: clamp(12px, 2.5vw, 18px);
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: clamp(10px, 2vh, 20px);
+            text-align: center;
         }
 
         .slimeSelection {
-            margin-bottom: 20px;
+            margin-bottom: clamp(10px, 2vh, 20px);
+            width: 100%;
+            max-width: 600px;
         }
 
         .slimeSelection h3 {
             color: white;
             margin-bottom: 12px;
-            font-size: 20px;
+            font-size: clamp(14px, 3vw, 20px);
+            text-align: center;
         }
 
         .slimeOptions {
             display: flex;
-            gap: 20px;
+            gap: clamp(10px, 2vw, 20px);
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .slimeOption {
-            width: 100px;
-            height: 100px;
+            width: clamp(60px, 12vw, 100px);
+            height: clamp(60px, 12vw, 100px);
             border-radius: 20px;
             cursor: pointer;
             border: 4px solid transparent;
@@ -134,14 +165,18 @@
         .slimePreview {
             width: 60px;
             height: 50px;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .controls {
             color: #94a3b8;
-            margin-bottom: 15px;
+            margin-bottom: clamp(10px, 2vh, 15px);
             text-align: center;
-            font-size: 14px;
+            font-size: clamp(11px, 2vw, 14px);
             line-height: 1.6;
+            max-width: 500px;
+            padding: 0 10px;
         }
 
         .controls strong {
@@ -149,14 +184,16 @@
         }
 
         .audioControls {
-            margin-bottom: 15px;
+            margin-bottom: clamp(10px, 2vh, 15px);
             display: flex;
-            gap: 15px;
+            gap: clamp(8px, 2vw, 15px);
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .audioToggle {
-            padding: 8px 16px;
-            font-size: 16px;
+            padding: clamp(6px, 1vh, 8px) clamp(12px, 2vw, 16px);
+            font-size: clamp(12px, 2.5vw, 16px);
             background: rgba(255,255,255,0.1);
             color: white;
             border: 2px solid #7dd3fc;
@@ -174,9 +211,9 @@
         }
 
         button {
-            margin-top: 10px;
-            padding: 12px 40px;
-            font-size: 22px;
+            margin-top: clamp(5px, 1vh, 10px);
+            padding: clamp(8px, 1.5vh, 12px) clamp(20px, 4vw, 40px);
+            font-size: clamp(14px, 3vw, 22px);
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -202,37 +239,40 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.95);
-            padding: 40px;
+            padding: clamp(20px, 4vw, 40px);
             border-radius: 20px;
             text-align: center;
             display: none;
             color: white;
             z-index: 20;
-            min-width: 400px;
+            min-width: min(400px, 90vw);
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         #gameOver h2 {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: clamp(28px, 6vw, 48px);
+            margin-bottom: clamp(10px, 2vh, 20px);
             color: #4ecdc4;
         }
 
         #gameOver p {
-            font-size: 24px;
-            margin: 10px 0;
+            font-size: clamp(14px, 3vw, 24px);
+            margin: clamp(5px, 1vh, 10px) 0;
         }
 
         .gameOverButtons {
             display: flex;
-            gap: 15px;
+            gap: clamp(8px, 2vw, 15px);
             justify-content: center;
-            margin-top: 20px;
+            margin-top: clamp(10px, 2vh, 20px);
             flex-wrap: wrap;
         }
 
         .gameOverButtons button {
-            padding: 12px 30px;
-            font-size: 20px;
+            padding: clamp(8px, 1.5vh, 12px) clamp(15px, 3vw, 30px);
+            font-size: clamp(14px, 2.5vw, 20px);
             margin: 0;
         }
 
@@ -242,37 +282,38 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.95);
-            padding: 40px;
+            padding: clamp(20px, 4vw, 40px);
             border-radius: 20px;
             display: none;
             color: white;
             z-index: 25;
-            min-width: 500px;
+            min-width: min(500px, 90vw);
             max-width: 90vw;
             max-height: 80vh;
             overflow-y: auto;
         }
 
         #leaderboard h2 {
-            font-size: 42px;
-            margin-bottom: 20px;
+            font-size: clamp(24px, 5vw, 42px);
+            margin-bottom: clamp(10px, 2vh, 20px);
             color: #fbbf24;
             text-align: center;
         }
 
         .leaderboardTable {
             width: 100%;
-            margin: 20px 0;
+            margin: clamp(10px, 2vh, 20px) 0;
         }
 
         .leaderboardEntry {
             display: flex;
             justify-content: space-between;
-            padding: 15px;
-            margin: 10px 0;
+            padding: clamp(8px, 1.5vh, 15px);
+            margin: clamp(5px, 1vh, 10px) 0;
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
             align-items: center;
+            gap: 10px;
         }
 
         .leaderboardEntry.myScore {
@@ -281,10 +322,11 @@
         }
 
         .leaderboardRank {
-            font-size: 32px;
+            font-size: clamp(18px, 4vw, 32px);
             font-weight: bold;
-            width: 60px;
+            min-width: clamp(30px, 8vw, 60px);
             text-align: center;
+            flex-shrink: 0;
         }
 
         .leaderboardRank.gold { color: #fbbf24; }
@@ -293,29 +335,33 @@
 
         .leaderboardName {
             flex: 1;
-            font-size: 20px;
+            font-size: clamp(12px, 2.5vw, 20px);
             text-align: left;
-            padding-left: 20px;
+            padding-left: clamp(5px, 2vw, 20px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .leaderboardScore {
-            font-size: 24px;
+            font-size: clamp(14px, 3vw, 24px);
             font-weight: bold;
             color: #4ecdc4;
+            flex-shrink: 0;
         }
 
         .closeButton {
-            margin-top: 20px;
-            padding: 12px 40px;
-            font-size: 20px;
+            margin-top: clamp(10px, 2vh, 20px);
+            padding: clamp(8px, 1.5vh, 12px) clamp(20px, 4vw, 40px);
+            font-size: clamp(14px, 2.5vw, 20px);
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .loadingMsg {
             text-align: center;
             color: #94a3b8;
-            padding: 20px;
-            font-size: 18px;
+            padding: clamp(10px, 2vh, 20px);
+            font-size: clamp(12px, 2.5vw, 18px);
         }
 
         .floatingBubble {
@@ -335,7 +381,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 48px;
+            font-size: clamp(24px, 6vw, 48px);
             color: #fbbf24;
             text-shadow: 0 0 20px rgba(251,191,36,0.8);
             pointer-events: none;
@@ -345,22 +391,57 @@
 
         #combo {
             top: 50%;
-            font-size: 72px;
+            font-size: clamp(32px, 8vw, 72px);
         }
 
         #powerupIndicator {
-            bottom: 20px;
-            font-size: 24px;
+            bottom: clamp(10px, 2vh, 20px);
+            font-size: clamp(14px, 3vw, 24px);
             background: rgba(0,0,0,0.7);
-            padding: 15px 30px;
+            padding: clamp(8px, 1.5vh, 15px) clamp(15px, 3vw, 30px);
             border-radius: 15px;
             backdrop-filter: blur(10px);
+        }
+
+        /* Mobile landscape optimizations */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #startMenu {
+                padding: 10px;
+            }
+            
+            #startMenu h1 {
+                font-size: clamp(20px, 5vw, 32px);
+                margin: 5px 0;
+            }
+            
+            .slimeSelection, .controls, .audioControls {
+                margin-bottom: 8px;
+            }
+        }
+
+        /* Tablet and desktop */
+        @media (min-width: 768px) {
+            #gameContainer {
+                width: min(800px, 90vw);
+                height: min(600px, 90vh);
+                border-radius: 20px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .stat {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="canvasContainer">
+            <canvas id="gameCanvas"></canvas>
+        </div>
         
         <div id="startMenu">
             <div class="floatingBubble" style="width: 80px; height: 80px; top: 10%; left: 10%; animation-delay: 0s;"></div>
@@ -441,11 +522,9 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        // TODO: Replace with your Firebase config
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // ⚠️ REPLACE THIS WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBAdtYCDQ8wr167I4AsM6U22Fe-xs9fjUM",
             authDomain: "slime-adventure-bf005.firebaseapp.com",
@@ -456,11 +535,9 @@
             measurementId: "G-X4YP13ZEWZ"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Make Firebase functions available globally
         window.saveScoreToFirebase = async function(playerName, playerScore) {
             try {
                 await addDoc(collection(db, 'leaderboard'), {
@@ -502,6 +579,42 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // Responsive canvas setup
+        let scale = 1;
+        let canvasWidth = 800;
+        let canvasHeight = 600;
+
+        function resizeCanvas() {
+            const container = document.getElementById('canvasContainer');
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            // Calculate aspect ratio
+            const targetAspect = 4 / 3; // 800/600
+            const containerAspect = containerWidth / containerHeight;
+            
+            if (containerAspect > targetAspect) {
+                // Container is wider - fit to height
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * targetAspect;
+            } else {
+                // Container is taller - fit to width
+                canvasWidth = containerWidth;
+                canvasHeight = containerWidth / targetAspect;
+            }
+            
+            // Set canvas size
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // Calculate scale for game objects
+            scale = canvasWidth / 800;
+            
+            // Update slime position to stay in bounds
+            if (slime.x > canvasWidth) slime.x = canvasWidth / 2;
+            if (slime.targetX > canvasWidth) slime.targetX = canvasWidth / 2;
+        }
 
         let score = 0;
         let level = 1;
@@ -511,7 +624,7 @@
         let particles = [];
         let powerups = [];
         let obstacles = [];
-        let mouseX = canvas.width / 2;
+        let mouseX = 0;
         let selectedSlimeColor = 'blue';
         let keys = {};
         let combo = 0;
@@ -534,20 +647,20 @@
         };
 
         const slime = {
-            x: canvas.width / 2,
-            y: canvas.height - 80,
+            x: 400,
+            y: 520,
             width: 60,
             height: 50,
             speed: 8,
-            targetX: canvas.width / 2
+            targetX: 400
         };
 
         class Bubble {
             constructor(x, y, speed, type = 'good') {
                 this.x = x;
                 this.y = y;
-                this.radius = 15 + Math.random() * 15;
-                this.speed = speed;
+                this.radius = (15 + Math.random() * 15) * scale;
+                this.speed = speed * scale;
                 this.type = type;
                 this.wobble = Math.random() * Math.PI * 2;
                 this.wobbleSpeed = 0.05 + Math.random() * 0.05;
@@ -560,7 +673,7 @@
             update() {
                 this.y += this.speed * (activePowerup === 'slowmo' ? 0.5 : 1);
                 this.wobble += this.wobbleSpeed;
-                this.x += Math.sin(this.wobble) * 2;
+                this.x += Math.sin(this.wobble) * 2 * scale;
             }
 
             draw() {
@@ -588,8 +701,8 @@
             constructor(x, y, type) {
                 this.x = x;
                 this.y = y;
-                this.radius = 20;
-                this.speed = 2;
+                this.radius = 20 * scale;
+                this.speed = 2 * scale;
                 this.type = type;
                 this.rotation = 0;
                 this.icons = {
@@ -611,7 +724,7 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.rotation);
                 
-                const gradient = ctx.createRadialGradient(0, 0, 5, 0, 0, this.radius);
+                const gradient = ctx.createRadialGradient(0, 0, 5 * scale, 0, 0, this.radius);
                 gradient.addColorStop(0, 'rgba(251,191,36,0.8)');
                 gradient.addColorStop(1, 'rgba(245,158,11,0.4)');
                 
@@ -620,10 +733,10 @@
                 ctx.fillStyle = gradient;
                 ctx.fill();
                 ctx.strokeStyle = '#fbbf24';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 3 * scale;
                 ctx.stroke();
                 
-                ctx.font = '24px Arial';
+                ctx.font = `${24 * scale}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(this.icons[this.type], 0, 0);
@@ -636,9 +749,9 @@
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.width = 80;
-                this.height = 20;
-                this.speed = 2 + level * 0.2;
+                this.width = 80 * scale;
+                this.height = 20 * scale;
+                this.speed = (2 + level * 0.2) * scale;
             }
 
             update() {
@@ -647,7 +760,7 @@
 
             draw() {
                 ctx.save();
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 10 * scale;
                 ctx.shadowColor = 'rgba(239,68,68,0.5)';
                 
                 const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
@@ -658,7 +771,7 @@
                 ctx.fillRect(this.x, this.y, this.width, this.height);
                 
                 ctx.fillStyle = '#fca5a5';
-                ctx.fillRect(this.x + 5, this.y + 5, this.width - 10, this.height - 10);
+                ctx.fillRect(this.x + 5 * scale, this.y + 5 * scale, this.width - 10 * scale, this.height - 10 * scale);
                 
                 ctx.restore();
             }
@@ -666,10 +779,13 @@
             checkCollision() {
                 if (activePowerup === 'shield') return false;
                 
-                return slime.x + slime.width / 2 > this.x &&
-                       slime.x - slime.width / 2 < this.x + this.width &&
-                       slime.y + slime.height / 2 > this.y &&
-                       slime.y - slime.height / 2 < this.y + this.height;
+                const slimeScaledWidth = slime.width * scale;
+                const slimeScaledHeight = slime.height * scale;
+                
+                return slime.x + slimeScaledWidth / 2 > this.x &&
+                       slime.x - slimeScaledWidth / 2 < this.x + this.width &&
+                       slime.y + slimeScaledHeight / 2 > this.y &&
+                       slime.y - slimeScaledHeight / 2 < this.y + this.height;
             }
         }
 
@@ -677,17 +793,17 @@
             constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
-                this.vx = (Math.random() - 0.5) * 8;
-                this.vy = (Math.random() - 0.5) * 8;
+                this.vx = (Math.random() - 0.5) * 8 * scale;
+                this.vy = (Math.random() - 0.5) * 8 * scale;
                 this.life = 1;
                 this.color = color;
-                this.size = 3 + Math.random() * 4;
+                this.size = (3 + Math.random() * 4) * scale;
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.vy += 0.2;
+                this.vy += 0.2 * scale;
                 this.life -= 0.02;
             }
 
@@ -761,65 +877,75 @@
         }
 
         function drawSlime() {
-            const squish = Math.sin(Date.now() * 0.005) * 3;
+            const squish = Math.sin(Date.now() * 0.005) * 3 * scale;
             const colors = slimeColors[selectedSlimeColor];
+            const slimeScaledWidth = slime.width * scale;
+            const slimeScaledHeight = slime.height * scale;
             
             if (activePowerup === 'shield') {
                 ctx.strokeStyle = 'rgba(125,211,252,0.5)';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 3 * scale;
                 ctx.beginPath();
-                ctx.arc(slime.x, slime.y, slime.width / 2 + 15, 0, Math.PI * 2);
+                ctx.arc(slime.x, slime.y, slimeScaledWidth / 2 + 15 * scale, 0, Math.PI * 2);
                 ctx.stroke();
             }
             
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 20 * scale;
             ctx.shadowColor = `${colors.primary}80`;
             
             const gradient = ctx.createRadialGradient(
-                slime.x, slime.y - 10, 10,
-                slime.x, slime.y, slime.width / 2
+                slime.x, slime.y - 10 * scale, 10 * scale,
+                slime.x, slime.y, slimeScaledWidth / 2
             );
             gradient.addColorStop(0, colors.primary);
             gradient.addColorStop(0.5, colors.secondary);
             gradient.addColorStop(1, colors.tertiary);
 
             ctx.beginPath();
-            ctx.ellipse(slime.x, slime.y + 10, slime.width / 2 + squish, slime.height / 2 - squish, 0, 0, Math.PI * 2);
+            ctx.ellipse(slime.x, slime.y + 10 * scale, slimeScaledWidth / 2 + squish, slimeScaledHeight / 2 - squish, 0, 0, Math.PI * 2);
             ctx.fillStyle = gradient;
             ctx.fill();
 
             ctx.beginPath();
-            ctx.moveTo(slime.x - 5, slime.y - 15);
-            ctx.bezierCurveTo(slime.x - 5, slime.y - 25, slime.x + 5, slime.y - 25, slime.x + 5, slime.y - 15);
-            ctx.bezierCurveTo(slime.x + 10, slime.y - 20, slime.x + 8, slime.y - 8, slime.x, slime.y - 10);
+            ctx.moveTo(slime.x - 5 * scale, slime.y - 15 * scale);
+            ctx.bezierCurveTo(
+                slime.x - 5 * scale, slime.y - 25 * scale,
+                slime.x + 5 * scale, slime.y - 25 * scale,
+                slime.x + 5 * scale, slime.y - 15 * scale
+            );
+            ctx.bezierCurveTo(
+                slime.x + 10 * scale, slime.y - 20 * scale,
+                slime.x + 8 * scale, slime.y - 8 * scale,
+                slime.x, slime.y - 10 * scale
+            );
             ctx.fillStyle = colors.drop;
             ctx.fill();
 
             ctx.shadowBlur = 0;
 
-            const eyeY = slime.y - 5;
+            const eyeY = slime.y - 5 * scale;
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.arc(slime.x - 12, eyeY, 8, 0, Math.PI * 2);
-            ctx.arc(slime.x + 12, eyeY, 8, 0, Math.PI * 2);
+            ctx.arc(slime.x - 12 * scale, eyeY, 8 * scale, 0, Math.PI * 2);
+            ctx.arc(slime.x + 12 * scale, eyeY, 8 * scale, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = '#1e293b';
             ctx.beginPath();
-            ctx.arc(slime.x - 12, eyeY, 5, 0, Math.PI * 2);
-            ctx.arc(slime.x + 12, eyeY, 5, 0, Math.PI * 2);
+            ctx.arc(slime.x - 12 * scale, eyeY, 5 * scale, 0, Math.PI * 2);
+            ctx.arc(slime.x + 12 * scale, eyeY, 5 * scale, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.arc(slime.x - 10, eyeY - 2, 2, 0, Math.PI * 2);
-            ctx.arc(slime.x + 14, eyeY - 2, 2, 0, Math.PI * 2);
+            ctx.arc(slime.x - 10 * scale, eyeY - 2 * scale, 2 * scale, 0, Math.PI * 2);
+            ctx.arc(slime.x + 14 * scale, eyeY - 2 * scale, 2 * scale, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.strokeStyle = '#f472b6';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2 * scale;
             ctx.beginPath();
-            ctx.arc(slime.x, eyeY + 8, 8, 0.2, Math.PI - 0.2);
+            ctx.arc(slime.x, eyeY + 8 * scale, 8 * scale, 0.2, Math.PI - 0.2);
             ctx.stroke();
         }
 
@@ -862,22 +988,22 @@
         }
 
         function spawnBubble() {
-            const x = Math.random() * (canvas.width - 60) + 30;
+            const x = Math.random() * (canvasWidth - 60 * scale) + 30 * scale;
             const speed = 1 + level * 0.3;
             const type = Math.random() > 0.25 ? 'good' : 'bad';
-            bubbles.push(new Bubble(x, -30, speed, type));
+            bubbles.push(new Bubble(x, -30 * scale, speed, type));
         }
 
         function spawnPowerup() {
             const types = ['shield', 'slowmo', 'magnet', 'double', 'life'];
             const type = types[Math.floor(Math.random() * types.length)];
-            const x = Math.random() * (canvas.width - 60) + 30;
-            powerups.push(new Powerup(x, -30, type));
+            const x = Math.random() * (canvasWidth - 60 * scale) + 30 * scale;
+            powerups.push(new Powerup(x, -30 * scale, type));
         }
 
         function spawnObstacle() {
-            const x = Math.random() * (canvas.width - 100) + 50;
-            obstacles.push(new Obstacle(x, -30));
+            const x = Math.random() * (canvasWidth - 100 * scale) + 50 * scale;
+            obstacles.push(new Obstacle(x, -30 * scale));
         }
 
         function activatePowerup(type) {
@@ -906,8 +1032,9 @@
         }
 
         function checkCollision(bubble) {
-            let range = bubble.radius + slime.width / 2;
-            if (activePowerup === 'magnet') range += 50;
+            const slimeScaledWidth = slime.width * scale;
+            let range = bubble.radius + slimeScaledWidth / 2;
+            if (activePowerup === 'magnet') range += 50 * scale;
             
             const dx = bubble.x - slime.x;
             const dy = bubble.y - slime.y;
@@ -938,11 +1065,14 @@
         function updateGame() {
             if (!gameRunning) return;
 
+            const moveSpeed = slime.speed * scale;
+            const slimeScaledWidth = slime.width * scale;
+
             if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-                slime.targetX = Math.max(slime.width / 2, slime.targetX - slime.speed);
+                slime.targetX = Math.max(slimeScaledWidth / 2, slime.targetX - moveSpeed);
             }
             if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-                slime.targetX = Math.min(canvas.width - slime.width / 2, slime.targetX + slime.speed);
+                slime.targetX = Math.min(canvasWidth - slimeScaledWidth / 2, slime.targetX + moveSpeed);
             }
 
             slime.x += (slime.targetX - slime.x) * 0.15;
@@ -976,7 +1106,7 @@
                     bubbles.splice(index, 1);
                 }
 
-                if (bubble.y > canvas.height + bubble.radius) {
+                if (bubble.y > canvasHeight + bubble.radius) {
                     bubbles.splice(index, 1);
                     if (bubble.type === 'good') {
                         lives--;
@@ -995,13 +1125,13 @@
                 const dy = powerup.y - slime.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance < powerup.radius + slime.width / 2) {
+                if (distance < powerup.radius + slimeScaledWidth / 2) {
                     activatePowerup(powerup.type);
                     createParticles(powerup.x, powerup.y, '#fbbf24', 30);
                     powerups.splice(index, 1);
                 }
 
-                if (powerup.y > canvas.height + powerup.radius) {
+                if (powerup.y > canvasHeight + powerup.radius) {
                     powerups.splice(index, 1);
                 }
             });
@@ -1021,7 +1151,7 @@
                     }
                 }
 
-                if (obstacle.y > canvas.height) {
+                if (obstacle.y > canvasHeight) {
                     obstacles.splice(index, 1);
                 }
             });
@@ -1050,18 +1180,18 @@
                 level = Math.floor(score / 100) + 1;
             }
 
-            bgOffset += 0.5;
+            bgOffset += 0.5 * scale;
             updateUI();
         }
 
         function drawBackground() {
             ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
             for (let i = 0; i < 100; i++) {
-                const x = (i * 137.5) % canvas.width;
-                const y = ((i * 97.3 + bgOffset) % canvas.height);
-                const size = 1 + (i % 3);
+                const x = (i * 137.5 * scale) % canvasWidth;
+                const y = ((i * 97.3 * scale + bgOffset) % canvasHeight);
+                const size = (1 + (i % 3)) * scale;
                 ctx.fillStyle = `rgba(255,255,255,${0.1 + (i % 3) * 0.05})`;
                 ctx.beginPath();
                 ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -1112,6 +1242,12 @@
             powerupTimer = 0;
             gameRunning = true;
             document.getElementById('gameOver').style.display = 'none';
+            
+            // Reset slime position
+            slime.x = canvasWidth / 2;
+            slime.y = canvasHeight - 80 * scale;
+            slime.targetX = canvasWidth / 2;
+            
             updateUI();
         }
 
@@ -1200,9 +1336,16 @@
             score = 0;
             level = 1;
             combo = 0;
+            
+            // Set initial slime position based on current canvas size
+            slime.x = canvasWidth / 2;
+            slime.y = canvasHeight - 80 * scale;
+            slime.targetX = canvasWidth / 2;
+            
             initAudio();
         }
 
+        // Input handlers
         document.addEventListener('keydown', (e) => {
             keys[e.key] = true;
         });
@@ -1221,8 +1364,16 @@
             const rect = canvas.getBoundingClientRect();
             const touch = e.touches[0];
             slime.targetX = touch.clientX - rect.left;
-        });
+        }, { passive: false });
 
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            slime.targetX = touch.clientX - rect.left;
+        }, { passive: false });
+
+        // Spawn intervals
         setInterval(() => {
             if (gameRunning) {
                 spawnBubble();
@@ -1241,11 +1392,19 @@
             }
         }, 4000);
 
+        // Initialize slime previews
         document.querySelectorAll('.slimePreview').forEach((canvas, index) => {
             const colors = ['blue', 'pink', 'green', 'purple', 'orange'];
             drawSlimePreview(canvas, colors[index]);
         });
 
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+
+        // Initial setup
+        resizeCanvas();
         updateUI();
         gameLoop();
     </script>
