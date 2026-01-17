@@ -62,10 +62,6 @@
             display: none;
         }
 
-        #gameTitle.playing {
-            display: block;
-        }
-
         .stat {
             background: rgba(0,0,0,0.3);
             padding: 10px 20px;
@@ -1295,7 +1291,6 @@
         function showMainMenu() {
             document.getElementById('gameOver').style.display = 'none';
             document.getElementById('startMenu').style.display = 'flex';
-            document.getElementById('gameTitle').classList.remove('playing');
             gameRunning = false;
             bubbles = [];
             particles = [];
@@ -1519,7 +1514,6 @@
 
         function startGame() {
             document.getElementById('startMenu').style.display = 'none';
-            document.getElementById('gameTitle').classList.add('playing');
             gameRunning = true;
             lives = slime.startingLives;
             score = 0;
